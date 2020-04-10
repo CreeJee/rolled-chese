@@ -1,14 +1,15 @@
 import { hook } from "rolled";
 import { useEventListeners } from "./UseEventListener.js";
-import { Context } from "rolled/src/hook/basic";
+import { HookContext, invokeEvent } from "rolled/src/hook/basic";
+import { boundEvent, clearEvent } from "rolled/src/hook/event";
 let draggedContext = null;
-let onDragComplete = null;
+const eventName = "onDragComplete";
 /**
  * @template T
- * @param {import("rolled/src/hook/basic").HookContext<T>} context
+ * @param {HookContext<T>} context
  * @param {import("rolled/src").hElement} $ref
  * @param {() => string} sendData
- * @param {(context: import("rolled/src/hook/basic").HookContext<T>) => void} onComplete
+ * @param {(context: HookContext<T>) => void} onComplete
  */
 export const useDrag = (context, $ref, sendData, onComplete) => {
     useEventListeners(context, [
@@ -24,7 +25,8 @@ export const useDrag = (context, $ref, sendData, onComplete) => {
             "dragover",
             (e) => {
                 draggedContext = context;
-                onDragComplete = onComplete;
+                clearEvent(draggedContext, eventName);
+                boundEvent(draggedContext, eventName, onComplete);
             },
         ],
     ]);
@@ -38,9 +40,8 @@ export const useDrop = (context, $ref, onDrop, beforeTarget) => {
                 const data = e.dataTransfer.getData("text/plain");
                 if (data.length > 0) {
                     onDrop(data);
-                    onDragComplete(draggedContext);
+                    invokeEvent(draggedContext, eventName);
                     draggedContext = null;
-                    onDragComplete = null;
                 }
             },
         ],

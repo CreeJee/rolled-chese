@@ -6,12 +6,15 @@ import Sand from "../Assets/Img/Tile/Sand.svg";
 import River from "../Assets/Img/Tile/River.svg";
 // @ts-ignore
 import Mountain from "../Assets/Img/Tile/Mountain.svg";
+// @ts-ignore
+import Wall from "../Assets/Img/Tile/Wall.svg";
 
 export const Characters = {
-  Tank,
+    Tank,
 };
 export const Tiles = {
-  Sand,
-  River,
-  Mountain,
+    Sand,
+    River,
+    Mountain,
+    Wall,
 };

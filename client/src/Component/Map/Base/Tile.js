@@ -44,7 +44,9 @@ export const Tile = ({ disabled, type, nth, biome }, context) => {
             (name) => {
                 setState([{ name }]);
             },
-            () => state.value.length === 0
+            () => {
+                return state.value.length === 0;
+            }
         );
     }
     return $dom;
