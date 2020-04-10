@@ -1,0 +1,11 @@
+{
+  "modules": true,
+  "plugins": {
+      "postcss-import": {},
+      "postcss-parcel-import": {},
+      "postcss-mixins": {},
+      "postcss-nested": {},
+      "autoprefixer": {},
+      "cssnano": {},
+  }
+}

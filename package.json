@@ -1,0 +1,28 @@
+{
+    "name": "rolled-chese",
+    "version": "0.0.1",
+    "description": "open-chese",
+    "main": "index.js",
+    "scripts": {
+        "cleanup": "rd /s /q .cache dist",
+        "test-parcel": "parcel ./client/index.html",
+        "test": "npm run cleanup && npm run test-parcel",
+        "build": "npm run cleanup && parcel build ./client/index.html"
+    },
+    "author": "CreeJee",
+    "license": "MIT",
+    "dependencies": {
+        "rolled": "file:../rolled"
+    },
+    "devDependencies": {
+        "autoprefixer": "^9.7.5",
+        "babel-core": "^6.26.3",
+        "babel-preset-env": "^1.7.0",
+        "parcel-bundler": "^1.12.4",
+        "postcss-import": "^12.0.1",
+        "postcss-mixins": "^6.2.3",
+        "postcss-modules": "^1.5.0",
+        "postcss-nested": "^4.2.1",
+        "postcss-parcel-import": "^0.0.2"
+    }
+}
