@@ -19,7 +19,7 @@ export const Tile = ({ disabled, type, nth, biome }, context) => {
         ? "player"
         : "victim";
     const $dom = h`
-        <div class="hex #classref">
+        <div class="hex ${tileClass}">
             <div class="hex-item" #tile>
             </div>
             ${
@@ -29,8 +29,6 @@ export const Tile = ({ disabled, type, nth, biome }, context) => {
             }
         </div>
     `;
-    const { tile, classref } = $dom.collect();
-    classref.update(tileClass);
     if (!disabled && type === "player") {
         const [state, setState] = childMount(
             context,
@@ -40,7 +38,7 @@ export const Tile = ({ disabled, type, nth, biome }, context) => {
         );
         useDrop(
             context,
-            tile,
+            "tile",
             (name) => {
                 setState([{ name }]);
             },

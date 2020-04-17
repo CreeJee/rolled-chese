@@ -28,3 +28,16 @@ export function createMap(length, fn) {
 export function createWorld() {
     return createMap(MAP.width * MAP.height, mapGenerate);
 }
+export function createPosition(x, y) {
+    return { x, y };
+}
+export function posToVector(pos) {
+    return {
+        x: pos % MAP.width,
+        y: Math.floor(pos / MAP.width),
+    };
+}
+
+export function vectorToPos(x, y) {
+    return y * MAP.width + x;
+}

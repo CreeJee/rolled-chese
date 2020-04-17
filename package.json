@@ -12,7 +12,7 @@
     "author": "CreeJee",
     "license": "MIT",
     "dependencies": {
-        "rolled": "file:../rolled"
+        "rolled": "0.0.9"
     },
     "devDependencies": {
         "autoprefixer": "^9.7.5",

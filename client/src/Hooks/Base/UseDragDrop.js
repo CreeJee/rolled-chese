@@ -2,26 +2,30 @@ import { hook } from "rolled";
 import { useEventListeners } from "./UseEventListener.js";
 import { HookContext, invokeEvent } from "rolled/src/hook/basic";
 import { boundEvent, clearEvent } from "rolled/src/hook/event";
+/**
+ * @template T
+ * @type {HookContext<T> | null}
+ */
 let draggedContext = null;
 const eventName = "onDragComplete";
 /**
  * @template T
  * @param {HookContext<T>} context
- * @param {import("rolled/src").hElement} $ref
+ * @param {string} ref
  * @param {() => string} sendData
  * @param {(context: HookContext<T>) => void} onComplete
  */
-export const useDrag = (context, $ref, sendData, onComplete) => {
+export const useDrag = (context, ref, sendData, onComplete) => {
     useEventListeners(context, [
         [
-            $ref,
+            ref,
             "dragstart",
             (e) => {
                 e.dataTransfer.setData("text/plain", sendData());
             },
         ],
         [
-            $ref,
+            ref,
             "dragover",
             (e) => {
                 draggedContext = context;
@@ -31,14 +35,21 @@ export const useDrag = (context, $ref, sendData, onComplete) => {
         ],
     ]);
 };
-export const useDrop = (context, $ref, onDrop, beforeTarget) => {
+/**
+ * @template T
+ * @param {HookContext<T>} context
+ * @param {string} ref
+ * @param {(data: string) => void} onDrop
+ * @param {() => boolean} beforeTarget
+ */
+export const useDrop = (context, ref, onDrop, beforeTarget) => {
     useEventListeners(context, [
         [
-            $ref,
+            ref,
             "drop",
             (e) => {
                 const data = e.dataTransfer.getData("text/plain");
-                if (data.length > 0) {
+                if (data.length > 0 && draggedContext !== null) {
                     onDrop(data);
                     invokeEvent(draggedContext, eventName);
                     draggedContext = null;
@@ -46,7 +57,7 @@ export const useDrop = (context, $ref, onDrop, beforeTarget) => {
             },
         ],
         [
-            $ref,
+            ref,
             "dragover",
             (e) => {
                 if (beforeTarget()) {

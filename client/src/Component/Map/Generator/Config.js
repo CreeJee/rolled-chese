@@ -1,6 +1,7 @@
+import { MAP_WIDTH, MAP_HEIGHT } from "../../Config.js";
 const MAPInfo = {
-    width: 16,
-    height: 11,
+    width: MAP_WIDTH,
+    height: MAP_HEIGHT,
     middleHeight: 0,
     middleStartHeight: 0,
     middleEndHeight: 0,

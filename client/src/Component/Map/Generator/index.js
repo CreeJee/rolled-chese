@@ -1,28 +1,30 @@
 import { MAP } from "./Config.js";
 import { applyBiome } from "./Biome.js";
 import { createMap, createWorld } from "./Base.js";
+import { search } from "./BehaviorTree/AStar.js";
 
 export function generateMap() {
-    const mapData = createWorld();
-    mapData.splice(
+    const worldData = createWorld();
+    const victimMapData = worldData.splice(
         MAP.victimRectStart,
         0,
         ...applyBiome(
-            mapData.splice(
+            worldData.splice(
                 MAP.victimRectStart,
                 MAP.victimRectEnd + 1 - MAP.victimRectStart
             )
         )
     );
-    mapData.splice(
+    const playerMapData = worldData.splice(
         MAP.playerRectStart,
         0,
         ...applyBiome(
-            mapData.splice(
+            worldData.splice(
                 MAP.playerRectStart,
                 MAP.playerRectEnd + 1 - MAP.playerRectStart
             )
         )
     );
-    return mapData;
+
+    return worldData;
 }

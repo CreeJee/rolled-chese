@@ -1,4 +1,4 @@
-import { h } from "rolled/src";
+import { h } from "rolled/src/base";
 import { CharacterTemplate } from "../Character/Factory.js";
 import { useEventListener } from "../../Hooks/Base/UseEventListener.js";
 import { useDrag } from "../../Hooks/Base/UseDragDrop.js";
@@ -13,10 +13,9 @@ export const CharacterGrid = ({ name }, context) => {
     const $dom = h`<div class="flex-item character-item" draggable #root>
         ${!!name ? shopSlot : ""}
     </div>`;
-    const { root } = $dom.collect();
     useDrag(
         context,
-        root,
+        "root",
         () => characterName,
         (context) => {
             // @ts-ignore

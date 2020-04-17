@@ -1,27 +1,29 @@
 import { hook } from "rolled";
 const { c } = hook;
-export const useEventListener = (context, domRef, eventName, handler) => {
+export const useEventListener = (context, ref, eventName, handler) => {
+    const collectedRef = context.$self.collect();
     context.useEffect(() => {
-        if (!(domRef instanceof HTMLElement)) {
-            throw new Error("domRef is must HTMLElement");
+        if (!(ref in collectedRef)) {
+            throw new Error(`${ref} is not found`);
         }
-        domRef.addEventListener(eventName, handler);
+        collectedRef[ref].addEventListener(eventName, handler);
         return () => {
-            domRef.removeEventListener(eventName, handler);
+            collectedRef[ref].removeEventListener(eventName, handler);
         };
     }, []);
 };
 export const useEventListeners = (context, refSet) => {
     context.useEffect(() => {
+        const collectedRef = context.$self.collect();
         for (const [ref, eventName, handler] of refSet) {
-            if (!(ref instanceof HTMLElement)) {
-                throw new Error("domRef is must HTMLElement");
+            if (!(ref in collectedRef)) {
+                throw new Error(`${ref} is not found`);
             }
-            ref.addEventListener(eventName, handler);
+            collectedRef[ref].addEventListener(eventName, handler);
         }
         return () => {
             for (const [ref, eventName, handler] of refSet) {
-                ref.removeEventListener(eventName, handler);
+                collectedRef[ref].removeEventListener(eventName, handler);
             }
         };
     }, []);

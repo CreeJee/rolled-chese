@@ -1,6 +1,11 @@
-import { h } from "rolled/src";
+import { h } from "rolled/src/base";
 import * as Groups from "../Assets.js";
 import { Context } from "rolled/src/hook/basic";
+/**
+ * @param {string} name
+ * @param {keyof Groups} group
+ * @return {{[k: string]: any} | never}
+ */
 const getImage = (name, group) => {
     const Collections = Groups[group];
     if (typeof Collections !== "object") {
