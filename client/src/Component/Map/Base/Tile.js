@@ -5,6 +5,7 @@ import { childMount } from "../../../Hooks/Base/Mount.js";
 import { CharacterFactory } from "../../Character/Factory.js";
 import { useDrop } from "../../../Hooks/Base/UseDragDrop.js";
 import { ImageTemplate } from "../../Base/ImageFactory.js";
+import { posToVector } from "../Generator/Base.js";
 
 const { getHook } = hook;
 const { setupSyntheticEvent, addEventListener } = syntheticEvents;
@@ -12,14 +13,14 @@ const { fragment, h } = dom;
 
 // setupSyntheticEvent("drop");
 // setupSyntheticEvent("dragover");
-export const Tile = ({ disabled, type, nth, biome }, context) => {
+export const Tile = ({ disabled, type, nth, biome, text }, context) => {
     const tileClass = disabled
         ? "disabled"
         : type === "player"
         ? "player"
         : "victim";
     const $dom = h`
-        <div class="hex ${tileClass}">
+        <div class="hex ${tileClass}" title="${text}" alt="${text}">
             <div class="hex-item" #tile>
             </div>
             ${

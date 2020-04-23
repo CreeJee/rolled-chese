@@ -60,11 +60,21 @@ function __createHeuristicNode(
     end,
     g,
     parent = null,
+    extra = {},
     h = heuristic(pos, end)
 ) {
-    return { ...pos, closed: false, g, h, f: g + h, visited: false, parent };
+    return {
+        ...pos,
+        closed: false,
+        g,
+        h,
+        f: g + h,
+        visited: false,
+        parent,
+        ...extra,
+    };
 }
-function __createStruct(x, y, end, parent, mapData) {
+function __createStruct(x, y, end, parent, direction = "NONE", mapData) {
     const pos = createPosition(x, y);
     return __createHeuristicNode(
         pos,
@@ -74,57 +84,104 @@ function __createStruct(x, y, end, parent, mapData) {
                 ...pos,
                 ...mapData[vectorToPos(x, y)],
             }),
-        parent
+        parent,
+        {
+            direction,
+        }
     );
 }
 function calcNeighbors(end, parent, mapData) {
     const neighbors = [];
     const { x, y } = parent;
+    const isEven = x % 2 === 0;
     const ableDirection = {
         px: x < MAP.width - 1, // left
         mx: x > 0, // bottom
         py: y < MAP.height - 1, // right
         my: y > 0, // top
+        oddTop: {
+            mx: x > 1, // bottom
+        },
     };
     const solvedTiles = {
-        upLeft: ableDirection.my && !__isDisabledTile(x, y - 1, mapData),
         left: ableDirection.mx && !__isDisabledTile(x - 1, y, mapData),
-        downLeft:
-            ableDirection.mx &&
-            ableDirection.py &&
-            !__isDisabledTile(x - 1, y + 1, mapData),
-        upRight:
-            ableDirection.px &&
-            ableDirection.my &&
-            !__isDisabledTile(x + 1, y - 1, mapData),
         right: ableDirection.px && !__isDisabledTile(x + 1, y, mapData),
-        downRight: ableDirection.py && !__isDisabledTile(x, y + 1, mapData),
-        // down: ableDirection.py && !__isDisabledTile(x, y + 1, mapData),
-        // up: ableDirection.my && !__isDisabledTile(x, y - 1, mapData),
+        odd: {
+            upLeft: ableDirection.my && !__isDisabledTile(x, y - 1, mapData),
+            downLeft:
+                ableDirection.mx &&
+                ableDirection.py &&
+                !__isDisabledTile(x - 1, y + 1, mapData),
+            upRight:
+                ableDirection.px &&
+                ableDirection.my &&
+                !__isDisabledTile(x + 1, y - 1, mapData),
+            downRight: ableDirection.py && !__isDisabledTile(x, y + 1, mapData),
+        },
+        even: {
+            upLeft:
+                ableDirection.my &&
+                ableDirection.mx &&
+                !__isDisabledTile(x - 1, y - 1, mapData),
+            downLeft:
+                ableDirection.oddTop.mx &&
+                ableDirection.py &&
+                !__isDisabledTile(x - 2, y + 1, mapData),
+            upRight: ableDirection.my && !__isDisabledTile(x, y - 1, mapData),
+            downRight:
+                ableDirection.mx &&
+                ableDirection.py &&
+                !__isDisabledTile(x - 1, y + 1, mapData),
+        },
     };
-    // if (solvedTiles.up) {
-    //     neighbors.push(__createStruct(x, y - 1, end, parent, mapData));
-    // }
-    // if (solvedTiles.down) {
-    //     neighbors.push(__createStruct(x, y + 1, end, parent, mapData));
-    // }
-    if (solvedTiles.upLeft) {
-        neighbors.push(__createStruct(x, y - 1, end, parent, mapData));
-    }
     if (solvedTiles.left) {
-        neighbors.push(__createStruct(x - 1, y, end, parent, mapData));
-    }
-    if (solvedTiles.downLeft) {
-        neighbors.push(__createStruct(x - 1, y + 1, end, parent, mapData));
-    }
-    if (solvedTiles.upRight) {
-        neighbors.push(__createStruct(x + 1, y - 1, end, parent, mapData));
+        neighbors.push(__createStruct(x - 1, y, end, parent, "left", mapData));
     }
     if (solvedTiles.right) {
-        neighbors.push(__createStruct(x + 1, y, end, parent, mapData));
+        neighbors.push(__createStruct(x + 1, y, end, parent, "right", mapData));
     }
-    if (solvedTiles.downRight) {
-        neighbors.push(__createStruct(x, y + 1, end, parent, mapData));
+    if (isEven) {
+        if (solvedTiles.even.upLeft) {
+            neighbors.push(
+                __createStruct(x - 1, y - 1, end, parent, "upLeft", mapData)
+            );
+        }
+        if (solvedTiles.even.downLeft) {
+            neighbors.push(
+                __createStruct(x - 2, y + 1, end, parent, "downLeft", mapData)
+            );
+        }
+        if (solvedTiles.even.upRight) {
+            neighbors.push(
+                __createStruct(x, y - 1, end, parent, "upRight", mapData)
+            );
+        }
+        if (solvedTiles.even.downRight) {
+            neighbors.push(
+                __createStruct(x - 1, y + 1, end, parent, "downRight", mapData)
+            );
+        }
+    } else {
+        if (solvedTiles.odd.upLeft) {
+            neighbors.push(
+                __createStruct(x, y - 1, end, parent, "upLeft", mapData)
+            );
+        }
+        if (solvedTiles.odd.downLeft) {
+            neighbors.push(
+                __createStruct(x - 1, y + 1, end, parent, "downLeft", mapData)
+            );
+        }
+        if (solvedTiles.odd.upRight) {
+            neighbors.push(
+                __createStruct(x + 1, y - 1, end, parent, "upRight", mapData)
+            );
+        }
+        if (solvedTiles.odd.downRight) {
+            neighbors.push(
+                __createStruct(x, y + 1, end, parent, "downRight", mapData)
+            );
+        }
     }
     return neighbors;
 }
@@ -133,7 +190,25 @@ function onHash({ x, y }) {
 }
 //state a, state b
 function heuristic(a, b) {
-    return Math.abs(a.x - b.x) + Math.abs(a.y - b.y);
+    const x1 = a.x,
+        x2 = b.x,
+        y1 = a.y,
+        y2 = b.y,
+        du = x2 - x1,
+        dv = y2 + Math.floor(x2 / 2) - (y1 + Math.floor(x1 / 2));
+    // return Math.max(
+    //     Math.abs(x1 - x2),
+    //     Math.abs(y1 - y2),
+    //     Math.abs(-x1 + -y1 - (-x2 + -y2))
+    // );
+    return Math.abs(x1 - x2) + Math.abs(y1 - y2);
+    // return Math.max(
+    //     Math.abs(x1 - x2),
+    //     Math.abs(y1 + Math.floor(x1 / 2) - (y2 + Math.floor(x2 / 2)))
+    // );
+    // return du >= 0 && dv >= 0
+    //     ? Math.max(Math.abs(du), Math.abs(dv))
+    //     : Math.abs(du) + Math.abs(dv);
 }
 function getPath(foundPath) {
     let node = foundPath;
@@ -141,9 +216,9 @@ function getPath(foundPath) {
     do {
         path.push(createPosition(node.x, node.y));
     } while ((node = node.parent) && typeof node === "object");
-    return path;
+    return path.reverse();
 }
-function getCost(node) {
+function getCost(currentNode) {
     return NODE_COST;
 }
 export function search(start, end, mapData) {
@@ -166,6 +241,7 @@ export function search(start, end, mapData) {
 
     while (!openQueue.isEmpty) {
         const currentNode = openQueue.pop();
+
         if (currentNode.x === end.x && currentNode.y === end.y) {
             return getPath(currentNode);
         }
@@ -174,7 +250,7 @@ export function search(start, end, mapData) {
             if (closedList.includes(neighbor)) {
                 continue;
             }
-            const gScore = currentNode.g + getCost(neighbor);
+            const gScore = currentNode.g + getCost(currentNode, neighbor);
             const beenVisited = neighbor.visited;
             if (!beenVisited || gScore < neighbor.g) {
                 neighbor.visited = true;
@@ -189,10 +265,8 @@ export function search(start, end, mapData) {
                     closestNode = neighbor;
                 }
                 if (!beenVisited) {
+                    neighbor.g = gScore;
                     openQueue.push(neighbor, neighbor.f);
-                } else {
-                    openQueue.remove(neighbor);
-                    openQueue.push(neighbor, neighbor.g);
                 }
             }
         }

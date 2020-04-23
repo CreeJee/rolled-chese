@@ -6,13 +6,15 @@
     "scripts": {
         "cleanup": "rd /s /q .cache dist",
         "test-parcel": "parcel ./client/index.html",
+        "cycle-test-parcel": "parcel ./test/cycle.html",
         "test": "npm run cleanup && npm run test-parcel",
         "build": "npm run cleanup && parcel build ./client/index.html"
     },
     "author": "CreeJee",
     "license": "MIT",
     "dependencies": {
-        "rolled": "0.0.9"
+        "rolled": "../rolled",
+        "three": "^0.115.0"
     },
     "devDependencies": {
         "autoprefixer": "^9.7.5",

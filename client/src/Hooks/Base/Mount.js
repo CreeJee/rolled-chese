@@ -1,11 +1,10 @@
-import { hook } from "rolled";
 import {
     useChannel,
     useEffect,
-    useState,
     reactiveMount,
-} from "rolled/src/hook/basic";
-const { c } = hook;
+    reactiveTagMount,
+    c,
+} from "rolled/src/hook/basic.js";
 export const childMount = (
     context,
     refName,
@@ -36,6 +35,50 @@ export const childMount = (
                                     setItems(cloned);
                                 },
                                 ownedChannelName: channelName,
+                            }));
+                            return Component(props, ownedContext);
+                        },
+                        { ...item },
+                        null
+                    );
+                })
+            );
+        },
+        [items]
+    );
+    return state;
+};
+export const virtualChildMount = (
+    context,
+    Renderer,
+    Component,
+    channelName = refName,
+    initValue = [],
+    customHooks = {}
+) => {
+    const state = useChannel(context, channelName, initValue, () => {});
+    const [items, setItems] = state;
+    useEffect(
+        context,
+        () => {
+            reactiveTagMount(
+                context.$self,
+                items.value.map((item, nth) => {
+                    return Renderer(
+                        (props, ownedContext) => {
+                            ownedContext.useHook(() => ({
+                                update: (item) => {
+                                    const cloned = [...items.value];
+                                    cloned.splice(nth, 1, item);
+                                    setItems(cloned);
+                                },
+                                remove: () => {
+                                    const cloned = [...items.value];
+                                    cloned.splice(nth, 1);
+                                    setItems(cloned);
+                                },
+                                ownedChannelName: channelName,
+                                ...customHooks,
                             }));
                             return Component(props, ownedContext);
                         },

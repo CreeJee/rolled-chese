@@ -2,9 +2,7 @@ import { MAP } from "./Config";
 
 const defaultFill = () => Object.create(null);
 function mapGenerate(v, k) {
-    // victim
     const base = {
-        nth: k,
         disabled: false,
     };
     if (MAP.playerRectStart <= k && k <= MAP.playerRectEnd) {

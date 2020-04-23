@@ -26,8 +26,11 @@ export const Worlds = [
 export function applyBiome(mapData) {
     const map = [...mapData];
     // const world = Worlds[Math.floor(Math.random() * Worlds.length)];
-    const astarData = search({ x: 0, y: 0 }, { x: 1, y: 3 }, mapData);
-    const biomeData = astarData.map(({ x, y }) => riverMark(x, y));
+    const astarData = search({ x: 2, y: 3 }, { x: 1, y: 2 }, mapData);
+    console.log(astarData);
+    const biomeData = astarData.map(({ x, y }, nth) =>
+        Object.assign(riverMark(x, y), { text: `${nth}` })
+    );
     const world = createTemplate(sand, ...biomeData);
     const defaultTile = world.tile;
     const tileData = world.biome;
@@ -41,9 +44,10 @@ export function applyBiome(mapData) {
         const { biome, isBlock = false, ...extra } = currentTile;
         Object.assign(item, {
             biome,
-            biomeSettings: extra,
+            ...extra,
             disabled: isBlock,
         });
+        item.text = `[${x},${y}]${item.text}`;
     }
     return map;
 }
